@@ -66,29 +66,35 @@ def newUser():
     addPassword = 'N'
     while confirm != 'Y':
         username = input('Enter the name for the user you wish to add : ')
+        if any(char.isupper() for char in username):
+            print("The username must not contain any capital letter.")
+            continue
         print('Use the username "' + username + '" (Y/N)')
         confirm = input().upper()
+        if confirm != "Y":
+            continue
         os.system("sudo adduser " + username)
-
-    while addPassword != 'Y':
-        addPassword = input('Do you want to set a password for the user?  (Y/N)').upper()
-        if addPassword != 'N':
-            os.system('sudo passwd' + username)
+        print('User Added successfully')
 def removeUser():
     # Remove a user with home   
     confirm = 'N'
     while confirm != 'Y':
-        username = input('Enter the name for the user you wish to remove : ')
+        username = input('Enter user name : ')
         print('remove the username "' + username + '" (Y/N)')
         confirm = input().upper()
         if(confirm == 'Y'):
+            withHome = input("remove the user with his home directory  (Y/N)")
+            if(withHome == 'Y'):
+                os.system("sudo deluser --remove-home " + username)
+                print('user has been deleted with his home directory')
+                break
             os.system("sudo deluser " + username)
             print('user has been deleted')
 
 def createGroup():
     confirm = 'N'
     while confirm != 'Y':
-        gropuName = input('Enter the name for the Group you wish to create : ')
+        gropuName = input('Enter group name : ')
         print('Use the Group "' + gropuName + '" (Y/N)')
         confirm = input().upper()
         if(confirm == 'Y'):
@@ -98,8 +104,8 @@ def createGroup():
 def addUserToGroup():
     confirm = 'N'
     while confirm != 'Y':
-        username = input('Enter the name for the user you wish to add to Group : ')
-        groupName = input('Enter the group name you wish the user to be added to : ')
+        username = input('Enter user name : ')
+        groupName = input('Enter group name : ')
         print('the username : "' + username + ' and the group name is : ' + groupName + ' (Y/N)')
         confirm = input().upper()
         if(confirm == 'Y'):
@@ -107,8 +113,8 @@ def addUserToGroup():
 def removeUserFromGroup():
     confirm = 'N'
     while confirm != 'Y':
-        username = input('Enter the name for the user you wish to remove from a Group : ')
-        groupName = input('Enter the group name you wish the user to be removed form : ')
+        username = input('Enter user name : ')
+        groupName = input('Enter group name : ')
         print('the username : "' + username + ' and the group name is : ' + groupName + ' (Y/N)')
         confirm = input().upper()
         if(confirm == 'Y'):
@@ -117,18 +123,21 @@ def removeUserFromGroup():
 def removeGroup():
     confirm = 'N'
     while confirm != 'Y':
-        groupName = input('Enter the group name you wish to remove : ')
+        groupName = input('Enter group name : ')
         print('Use the Group "' + groupName + '" (Y/N)')
         confirm = input().upper()
         if(confirm == 'Y'):
             os.system("sudo delgroup " + groupName)
 def showUsers():
-    os.system("cat /etc/passwd")
+    os.system("cut -d: -f1 /etc/passwd")
 def showGroups():
-    os.system('cat /etc/group')
+    os.system('cut -d: -f1 /etc/group')
+def showUsersInGroup():
+    groupName = input('Enter the group name : ')
+    os.system('getent group ' + groupName)
 flag = True
 while(flag):
-    user_input = int(input('choose your operation \n 1- Add user \n 2- remove user \n 3- add group \n 4- add user to a group \n 5- Remove user from a group \n 6- Remove group  \n 7- show all users and groups \n 8- Show all Groups \n 9- Exit \n INPUT : '))
+    user_input = int(input('choose your operation \n 1- Add user \n 2- remove user \n 3- add group \n 4- add user to a group \n 5- Remove user from a group \n 6- Remove group  \n 7- show all users \n 8- Show all Groups \n 9- Show users in a group\n 10- Exit \n INPUT : '))
     
     if(user_input == 1):
         newUser()
@@ -148,7 +157,10 @@ while(flag):
     elif(user_input == 8):
         showGroups()
         
-    elif(user_input == 9):
+    elif(user_input ==9):
+        showUsersInGroup()
+        
+    elif(user_input == 10):
         flag = False
     else:
         print('In valid input')
